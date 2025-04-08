@@ -12,12 +12,15 @@ public class Snake {
         snakeBody.add(new Node(20, 0));
     }
 
+    public ArrayList<Node> getSnakeBody() {
+        return snakeBody;
+    }
+
+
     public void drawSnake(Graphics g) {
         g.setColor(Color.ORANGE);
-        System.out.println("snakeBody" + snakeBody);
         for (Node n : snakeBody) {
             g.fillOval(n.x, n.y, Main.CELL_SIZE, Main.CELL_SIZE);
-
         }
 
     }
