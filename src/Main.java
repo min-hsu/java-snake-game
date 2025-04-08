@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,17 +7,20 @@ public class Main extends JPanel {
     public static int width = 400;
     public static int height = 400;
     public static int row = height / CELL_SIZE;
-    public static int col = width / CELL_SIZE;
+    public static int column = width / CELL_SIZE;
     private Snake snake;
+    private Fruit fruit;
 
     public Main() {
         snake = new Snake();
+        fruit = new Fruit();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         g.fillRect(0, 0, width, height);
         snake.drawSnake(g);
+        fruit.drawFruit(g);
     }
 
     @Override
