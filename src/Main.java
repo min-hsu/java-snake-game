@@ -1,10 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Main extends JPanel {
+public class Main extends JPanel implements KeyListener {
 
     public static final int CELL_SIZE = 20;
     public static int width = 400;
@@ -16,6 +18,7 @@ public class Main extends JPanel {
     private Timer t;
     private final int speed = 100;
     private static String direction;
+    private boolean allowKeyPress;
 
     public Main() {
         snake = new Snake();
@@ -28,12 +31,13 @@ public class Main extends JPanel {
             }
         }, 0, speed);
         direction = "Right";
+        addKeyListener(this);
+        allowKeyPress = true;
     }
 
 
     @Override
     public void paintComponent(Graphics g) {
-        System.out.println("We are calling paintComponent");
         g.fillRect(0, 0, width, height);
         snake.drawSnake(g);
         fruit.drawFruit(g);
@@ -59,7 +63,8 @@ public class Main extends JPanel {
         snake.getSnakeBody().removeLast();
         snake.getSnakeBody().addFirst(newHead);
 
-
+        requestFocusInWindow();
+        allowKeyPress = true;
     }
 
     @Override
@@ -75,6 +80,33 @@ public class Main extends JPanel {
         window.setLocationRelativeTo(null);
         window.setVisible(true);
         window.setResizable(false);
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (allowKeyPress) {
+            int keyCode = e.getKeyCode();
+            if (keyCode == 37 && !direction.equals("Right")) {
+                direction = "Left";
+            } else if (keyCode == 38 && !direction.equals("Down")) {
+                direction = "Up";
+            } else if (keyCode == 39 && !direction.equals("Left")) {
+                direction = "Right";
+            } else if (keyCode == 40 && !direction.equals("Up")) {
+                direction = "Down";
+            }
+            allowKeyPress = false;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
 
     }
 }
