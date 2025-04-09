@@ -19,10 +19,18 @@ public class Main extends JPanel implements KeyListener {
     private final int speed = 100;
     private static String direction;
     private boolean allowKeyPress;
+    private int score;
 
     public Main() {
         snake = new Snake();
         fruit = new Fruit();
+        setTimer();
+        direction = "Right";
+        addKeyListener(this);
+        allowKeyPress = true;
+    }
+
+    private void setTimer() {
         t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -30,17 +38,51 @@ public class Main extends JPanel implements KeyListener {
                 repaint();
             }
         }, 0, speed);
-        direction = "Right";
-        addKeyListener(this);
+    }
+
+    private void reset() {
+        score = 0;
+        if (snake != null) {
+            snake.getSnakeBody().clear();
+        }
         allowKeyPress = true;
+        direction = "Right";
+        snake = new Snake();
+        fruit = new Fruit();
+        setTimer();
     }
 
 
     @Override
     public void paintComponent(Graphics g) {
+        // Check if snake bites itself
+        ArrayList<Node> snakeBody = snake.getSnakeBody();
+        Node head = snakeBody.getFirst();
+        for (int i = 1; i < snakeBody.size(); i++) {
+            if (snakeBody.get(i).x == head.x && snakeBody.get(i).y == head.y) {
+                allowKeyPress = false;
+                t.cancel();
+                t.purge();
+                int response = JOptionPane.showOptionDialog(this, "GameOver!! Would you like to start over?", "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+                switch (response) {
+                    case JOptionPane.CLOSED_OPTION:
+                        System.exit(0);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        System.exit(0);
+                        break;
+                    case JOptionPane.YES_OPTION:
+                        reset();
+                        return;
+                }
+            }
+
+        }
+
+
         g.fillRect(0, 0, width, height);
-        snake.drawSnake(g);
         fruit.drawFruit(g);
+        snake.drawSnake(g);
 
         // Remove snake tail and put it in head
         int snakeX = snake.getSnakeBody().get(0).x;
@@ -59,12 +101,26 @@ public class Main extends JPanel implements KeyListener {
             snakeY += CELL_SIZE;
         }
 
-        Node newHead = new Node(snakeX, snakeY);
-        snake.getSnakeBody().removeLast();
-        snake.getSnakeBody().addFirst(newHead);
 
-        requestFocusInWindow();
+        Node newHead = new Node(snakeX, snakeY);
+
+        // Check if the snake eats the fruit
+        if (snake.getSnakeBody().getFirst().x == fruit.getX() && snake.getSnakeBody().getFirst().y == fruit.getY()) {
+            // 1. Set fruit to a new location
+            fruit.setNewLocation(snake);
+            // 2. draw fruit
+            fruit.drawFruit(g);
+            // 3. score++
+
+        } else {
+            snake.getSnakeBody().removeLast();
+        }
+
+
+        snake.getSnakeBody().addFirst(newHead);
         allowKeyPress = true;
+        requestFocusInWindow();
+
     }
 
     @Override
@@ -107,6 +163,6 @@ public class Main extends JPanel implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
     }
+
 }
