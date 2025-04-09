@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Fruit {
     private int x;
@@ -8,7 +9,8 @@ public class Fruit {
     private final ImageIcon img;
 
     public Fruit() {
-        img = new ImageIcon("src/fruit.png");
+//        img = new ImageIcon("src/fruit.png");
+        img = new ImageIcon(Objects.requireNonNull(getClass().getResource("fruit.png")));
         this.x = (int) (Math.floor(Math.random() * Main.column) * Main.CELL_SIZE);
         this.y = (int) (Math.floor(Math.random() * Main.row) * Main.CELL_SIZE);
     }

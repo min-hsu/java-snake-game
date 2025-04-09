@@ -32,7 +32,7 @@ public class Snake {
              if (n.x < 0) {
                 n.x = Main.width - Main.CELL_SIZE;
             }
-            if (n.y > Main.height) {
+            if (n.y >= Main.height) {
                 n.y = 0;
             }
             if (n.y < 0) {

@@ -2,6 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,14 +24,14 @@ public class Main extends JPanel implements KeyListener {
     private static String direction;
     private boolean allowKeyPress;
     private int score;
+    private int highestScore;
+    String desktop = System.getProperty("user.home") + "/Desktop/";
+    String myFile = desktop + "score.txt";
 
     public Main() {
-        snake = new Snake();
-        fruit = new Fruit();
-        setTimer();
-        direction = "Right";
+        readHighestScore();
+        reset();
         addKeyListener(this);
-        allowKeyPress = true;
     }
 
     private void setTimer() {
@@ -63,12 +67,11 @@ public class Main extends JPanel implements KeyListener {
                 allowKeyPress = false;
                 t.cancel();
                 t.purge();
-                int response = JOptionPane.showOptionDialog(this, "GameOver!! Would you like to start over?", "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+                int response = JOptionPane.showOptionDialog(this, "GameOver!! \n" + "The Highest Score was: " + highestScore + ".\nYour score is: " + score + ".\nWould you like to start over?", "Game Over", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, JOptionPane.YES_OPTION);
+                writeAFile(score);
                 switch (response) {
-                    case JOptionPane.CLOSED_OPTION:
-                        System.exit(0);
-                        break;
                     case JOptionPane.NO_OPTION:
+                    case JOptionPane.CLOSED_OPTION:
                         System.exit(0);
                         break;
                     case JOptionPane.YES_OPTION:
@@ -111,6 +114,7 @@ public class Main extends JPanel implements KeyListener {
             // 2. draw fruit
             fruit.drawFruit(g);
             // 3. score++
+            score++;
 
         } else {
             snake.getSnakeBody().removeLast();
@@ -163,6 +167,45 @@ public class Main extends JPanel implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+
+    private void readHighestScore() {
+        try {
+            File myObject = new File(myFile);
+            Scanner myReader = new Scanner(myObject);
+            highestScore = myReader.nextInt();
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            highestScore = 0;
+            try {
+                File myObject = new File(myFile);
+                if (myObject.createNewFile()) {
+                    System.out.println("File created" + myObject.getName());
+                }
+                FileWriter myWriter = new FileWriter(myObject.getName());
+                myWriter.write("" + 0);
+            } catch (IOException err) {
+                System.out.println("An Error occurred.");
+                err.printStackTrace();
+            }
+        }
+    }
+
+    private void writeAFile(int score) {
+        try {
+            FileWriter myWriter = new FileWriter(myFile);
+            if (score > highestScore) {
+                myWriter.write("" + score);
+                highestScore = score;
+            } else {
+                myWriter.write("" + highestScore);
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }
